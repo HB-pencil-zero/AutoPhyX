@@ -1,0 +1,30 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Large experiment artifacts
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.log
+nohup.out
+wandb/
+checkpoints*/
+outputs/
+render_outputs/
+features/
+augmented_materials/
+pixieverse_aug_json/
+pixieverse_text_emb/
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
