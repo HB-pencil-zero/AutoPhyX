@@ -30,8 +30,13 @@ embeddings.
   JSON augmentations.
 - `scripts/validate_checkpoint.py` - Evaluates a saved checkpoint on held-out
   objects.
+- `scripts/summarize_pixieverse_properties.py` - Summarizes base and augmented
+  material-property distributions into CSV.
 - `docs/pixieverse_v7_log_excerpt.md` - Preserved training-log excerpt from the
   run that reached validation loss near `0.01`.
+- `docs/pixieverse_property_distribution.csv` - Current PixieVerse `rho`, `E`,
+  and `nu` distribution summary, including JSON-factor and saved full-grid
+  augmentations.
 
 ## Expected Data Layout
 
