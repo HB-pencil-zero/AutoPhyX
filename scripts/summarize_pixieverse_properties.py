@@ -25,24 +25,18 @@ PROPERTIES = {
         "unit": "kg_m3",
         "scale": "log10",
         "range": (-2.0, 5.0),
-        "clip_raw": (1e-2, 1e5),
-        "normalization": "target=2*clip(log10(max(rho,1e-8)),-2,5)/15",
     },
     "E": {
         "channel": 1,
         "unit": "Pa",
         "scale": "log10",
         "range": (-2.0, 13.0),
-        "clip_raw": (1e-2, 1e13),
-        "normalization": "target=2*clip(log10(max(E,1e-8)),-2,13)/15",
     },
     "nu": {
         "channel": 2,
         "unit": "ratio",
         "scale": "linear",
         "range": (0.01, 0.5),
-        "clip_raw": (0.01, 0.5),
-        "normalization": "target=2*(clip(nu,0.01,0.50)-0.01)/0.49-1",
     },
 }
 
@@ -71,10 +65,6 @@ class PropertyStats:
     sumsq_value: float = 0.0
     min_value: float = math.inf
     max_value: float = -math.inf
-    norm_sum: float = 0.0
-    norm_sumsq: float = 0.0
-    norm_min: float = math.inf
-    norm_max: float = -math.inf
 
     def __post_init__(self) -> None:
         self.hist = np.zeros(len(self.edges) - 1, dtype=np.int64)
@@ -101,18 +91,10 @@ class PropertyStats:
             self.underflow += int((log_values < self.edges[0]).sum())
             self.overflow += int((log_values >= self.edges[-1]).sum())
             self.hist += np.histogram(log_values, bins=self.edges)[0]
-            norm = 2.0 * np.clip(np.log10(np.maximum(values64, 1e-8)), self.edges[0], self.edges[-1]) / 15.0
         else:
             self.underflow += int((values64 < self.edges[0]).sum())
             self.overflow += int((values64 >= self.edges[-1]).sum())
             self.hist += np.histogram(values64, bins=self.edges)[0]
-            norm = 2.0 * (np.clip(values64, self.edges[0], self.edges[-1]) - self.edges[0]) / (
-                self.edges[-1] - self.edges[0]
-            ) - 1.0
-        self.norm_sum += float(norm.sum())
-        self.norm_sumsq += float(np.square(norm).sum())
-        self.norm_min = min(self.norm_min, float(norm.min()))
-        self.norm_max = max(self.norm_max, float(norm.max()))
 
     @property
     def mean(self) -> float:
@@ -125,16 +107,11 @@ class PropertyStats:
         var = max(self.sumsq_value / self.total - self.mean * self.mean, 0.0)
         return math.sqrt(var)
 
-    @property
-    def norm_mean(self) -> float:
-        return self.norm_sum / self.total if self.total else math.nan
 
-    @property
-    def norm_std(self) -> float:
-        if self.total == 0:
-            return math.nan
-        var = max(self.norm_sumsq / self.total - self.norm_mean * self.norm_mean, 0.0)
-        return math.sqrt(var)
+def raw_edge(stats: PropertyStats, edge: float) -> float:
+    if stats.scale == "log10":
+        return 10.0**edge
+    return edge
 
 
 def property_edges(prop: str, bins_log: int, bins_nu: int) -> np.ndarray:
@@ -247,13 +224,6 @@ def write_rows(output_path: Path, all_stats: list[dict[str, PropertyStats]]) -> 
         "max",
         "mean",
         "std",
-        "training_normalization",
-        "clip_min_raw",
-        "clip_max_raw",
-        "normalized_min",
-        "normalized_max",
-        "normalized_mean",
-        "normalized_std",
         "root",
         "notes",
     ]
@@ -263,7 +233,6 @@ def write_rows(output_path: Path, all_stats: list[dict[str, PropertyStats]]) -> 
         for stats_by_prop in all_stats:
             for prop in ("rho", "E", "nu"):
                 stats = stats_by_prop[prop]
-                spec = PROPERTIES[prop]
                 total = stats.total or 1
                 common = {
                     "source": stats.source,
@@ -277,13 +246,6 @@ def write_rows(output_path: Path, all_stats: list[dict[str, PropertyStats]]) -> 
                     "max": f"{stats.max_value:.9g}" if stats.total else "",
                     "mean": f"{stats.mean:.9g}" if stats.total else "",
                     "std": f"{stats.std:.9g}" if stats.total else "",
-                    "training_normalization": spec["normalization"],
-                    "clip_min_raw": f"{spec['clip_raw'][0]:.9g}",
-                    "clip_max_raw": f"{spec['clip_raw'][1]:.9g}",
-                    "normalized_min": f"{stats.norm_min:.9g}" if stats.total else "",
-                    "normalized_max": f"{stats.norm_max:.9g}" if stats.total else "",
-                    "normalized_mean": f"{stats.norm_mean:.9g}" if stats.total else "",
-                    "normalized_std": f"{stats.norm_std:.9g}" if stats.total else "",
                     "root": stats.root,
                     "notes": stats.notes,
                 }
@@ -291,8 +253,10 @@ def write_rows(output_path: Path, all_stats: list[dict[str, PropertyStats]]) -> 
                 special_bins = []
                 if stats.scale == "log10":
                     special_bins.append(("nonpositive", "", "0", "<=0", stats.nonpositive))
-                special_bins.append(("underflow", "", f"{stats.edges[0]:.9g}", f"<{stats.edges[0]:.3g}", stats.underflow))
-                special_bins.append(("overflow", f"{stats.edges[-1]:.9g}", "", f">={stats.edges[-1]:.3g}", stats.overflow))
+                lower_raw = raw_edge(stats, stats.edges[0])
+                upper_raw = raw_edge(stats, stats.edges[-1])
+                special_bins.append(("underflow", "", f"{lower_raw:.9g}", f"<{lower_raw:.3g}", stats.underflow))
+                special_bins.append(("overflow", f"{upper_raw:.9g}", "", f">={upper_raw:.3g}", stats.overflow))
                 for label, left, right, bin_label, count in special_bins:
                     writer.writerow(
                         {
@@ -307,12 +271,9 @@ def write_rows(output_path: Path, all_stats: list[dict[str, PropertyStats]]) -> 
                     )
 
                 for idx, count in enumerate(stats.hist):
-                    left = stats.edges[idx]
-                    right = stats.edges[idx + 1]
-                    if stats.scale == "log10":
-                        label = f"10^{left:.3g}..10^{right:.3g}"
-                    else:
-                        label = f"{left:.3g}..{right:.3g}"
+                    left = raw_edge(stats, stats.edges[idx])
+                    right = raw_edge(stats, stats.edges[idx + 1])
+                    label = f"{left:.3g}..{right:.3g}"
                     writer.writerow(
                         {
                             **common,

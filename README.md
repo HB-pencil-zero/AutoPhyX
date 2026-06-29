@@ -69,12 +69,17 @@ emb_root/
 
 Voxel features are expected to be `[64, 64, 64, 768]`.
 
+## Property Distribution CSV
+
+`docs/pixieverse_property_distribution.csv` reports raw physical-property
+statistics only. The `rho` and `E` histograms use log-spaced bins, but
+`bin_left`, `bin_right`, `min`, `max`, `mean`, and `std` are all raw physical
+values in the units shown by the `unit` column.
+
 ## Target Normalization
 
-The distribution CSV reports raw physical-property statistics in `min`, `max`,
-`mean`, and `std`. It also records the training target transform in
-`training_normalization` and the resulting normalized statistics in
-`normalized_*` columns.
+Training normalizes raw properties before loss computation, but those
+normalized target values are intentionally not included in the distribution CSV.
 
 Training uses these transforms:
 
