@@ -69,6 +69,24 @@ emb_root/
 
 Voxel features are expected to be `[64, 64, 64, 768]`.
 
+## Target Normalization
+
+The distribution CSV reports raw physical-property statistics in `min`, `max`,
+`mean`, and `std`. It also records the training target transform in
+`training_normalization` and the resulting normalized statistics in
+`normalized_*` columns.
+
+Training uses these transforms:
+
+```text
+rho_target = 2 * clip(log10(max(rho, 1e-8)), -2, 5) / 15
+E_target   = 2 * clip(log10(max(E,   1e-8)), -2, 13) / 15
+nu_target  = 2 * (clip(nu, 0.01, 0.50) - 0.01) / 0.49 - 1
+```
+
+`nu` is not log-transformed. Negative `nu_target` values are expected because
+the raw `nu` interval `[0.01, 0.50]` is linearly mapped to `[-1, 1]`.
+
 ## Quick Start
 
 Install dependencies:
