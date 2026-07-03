@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
-import os
+import random
 from pathlib import Path
 from typing import Dict, Iterable, Optional, Tuple
 
@@ -14,6 +14,13 @@ from torch.utils.data import Dataset
 
 logger = logging.getLogger(__name__)
 SPATIAL = (2, 3, 4)
+PROPERTY_CHANNELS = ("rho", "E", "nu")
+
+LOG_RHO_RANGE = (-2.0, 5.0)
+LOG_E_RANGE = (-2.0, 13.0)
+NU_RANGE = (0.01, 0.50)
+LOG_RHO_SCALE = 15.0
+LOG_E_SCALE = 15.0
 
 
 def normalize_material_grid(material_grid: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
@@ -29,19 +36,53 @@ def normalize_material_grid(material_grid: np.ndarray) -> Tuple[np.ndarray, np.n
     mask = (material_grid[..., 3] >= 0).astype(np.float32)
 
     eps = 1e-8
-    density_log = np.clip(np.log10(np.maximum(density, eps)), -2.0, 5.0)
-    youngs_log = np.clip(np.log10(np.maximum(youngs_modulus, eps)), -2.0, 13.0)
-    poisson = np.clip(poisson, 0.01, 0.50)
+    density_log = np.clip(np.log10(np.maximum(density, eps)), *LOG_RHO_RANGE)
+    youngs_log = np.clip(np.log10(np.maximum(youngs_modulus, eps)), *LOG_E_RANGE)
+    poisson = np.clip(poisson, *NU_RANGE)
 
     target = np.stack(
         [
-            2.0 * density_log / 15.0,
-            2.0 * youngs_log / 15.0,
-            2.0 * (poisson - 0.01) / 0.49 - 1.0,
+            2.0 * density_log / LOG_RHO_SCALE,
+            2.0 * youngs_log / LOG_E_SCALE,
+            2.0 * (poisson - NU_RANGE[0]) / (NU_RANGE[1] - NU_RANGE[0]) - 1.0,
         ],
         axis=0,
     ).astype(np.float32)
     return target, mask
+
+
+def denormalize_material_grid(target_grid: np.ndarray) -> np.ndarray:
+    """Convert normalized `[3, D, H, W]` targets back to raw `[D, H, W, 3]`.
+
+    Output channel order is `[density, E, nu]`, matching `PROPERTY_CHANNELS`.
+    """
+    target = np.asarray(target_grid, dtype=np.float32)
+    if target.ndim != 4 or target.shape[0] != 3:
+        raise ValueError(f"expected [3, D, H, W] target grid, got {target.shape}")
+
+    density_log = target[0] * LOG_RHO_SCALE / 2.0
+    youngs_log = target[1] * LOG_E_SCALE / 2.0
+    poisson = (target[2] + 1.0) * (NU_RANGE[1] - NU_RANGE[0]) / 2.0 + NU_RANGE[0]
+    return np.stack([10.0**density_log, 10.0**youngs_log, poisson], axis=-1).astype(np.float32)
+
+
+def denormalize_material_tensor(target: torch.Tensor) -> torch.Tensor:
+    """Torch equivalent of `denormalize_material_grid`.
+
+    Accepts `[3, D, H, W]` or `[B, 3, D, H, W]` and returns the same spatial
+    shape with channels moved to the last dimension.
+    """
+    if target.dim() == 4:
+        density_log = target[0] * LOG_RHO_SCALE / 2.0
+        youngs_log = target[1] * LOG_E_SCALE / 2.0
+        poisson = (target[2] + 1.0) * (NU_RANGE[1] - NU_RANGE[0]) / 2.0 + NU_RANGE[0]
+        return torch.stack([10.0**density_log, 10.0**youngs_log, poisson], dim=-1)
+    if target.dim() == 5:
+        density_log = target[:, 0] * LOG_RHO_SCALE / 2.0
+        youngs_log = target[:, 1] * LOG_E_SCALE / 2.0
+        poisson = (target[:, 2] + 1.0) * (NU_RANGE[1] - NU_RANGE[0]) / 2.0 + NU_RANGE[0]
+        return torch.stack([10.0**density_log, 10.0**youngs_log, poisson], dim=-1)
+    raise ValueError(f"expected [3, D, H, W] or [B, 3, D, H, W], got {tuple(target.shape)}")
 
 
 def apply_json_factors(material_grid: np.ndarray, factors: Dict[str, float]) -> np.ndarray:
@@ -61,6 +102,37 @@ def masked_mse(pred: torch.Tensor, target: torch.Tensor, mask: torch.Tensor) -> 
     return ((pred - target) ** 2 * mask).sum(dim=SPATIAL).mean() / (
         mask.sum(dim=SPATIAL).mean() + 1e-8
     )
+
+
+def masked_channel_mse(
+    pred: torch.Tensor,
+    target: torch.Tensor,
+    mask: torch.Tensor,
+    channel_names: Tuple[str, ...] = PROPERTY_CHANNELS,
+) -> Dict[str, torch.Tensor]:
+    """Per-property MSE over occupied voxels in normalized/log target space."""
+    if mask.dim() == 4:
+        mask = mask.unsqueeze(1)
+    per_channel = ((pred - target) ** 2 * mask).sum(dim=SPATIAL) / (
+        mask.sum(dim=SPATIAL) + 1e-8
+    )
+    return {name: per_channel[:, idx].mean() for idx, name in enumerate(channel_names)}
+
+
+def split_indices_by_object(
+    dataset: "PixieVerseJsonDataset",
+    train_fraction: float,
+    seed: int,
+) -> Tuple[list[int], list[int]]:
+    """Create deterministic train/val indices with no object ID overlap."""
+    obj_ids = list(dataset.object_ids())
+    rng = random.Random(seed)
+    rng.shuffle(obj_ids)
+    n_train = int(len(obj_ids) * train_fraction)
+    train_objs = set(obj_ids[:n_train])
+    train_idx = [idx for idx, sample in enumerate(dataset.samples) if sample[0] in train_objs]
+    val_idx = [idx for idx, sample in enumerate(dataset.samples) if sample[0] not in train_objs]
+    return train_idx, val_idx
 
 
 class PixieVerseJsonDataset(Dataset):

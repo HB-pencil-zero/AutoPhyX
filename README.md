@@ -14,6 +14,14 @@ physical properties:
 The core model is a 3D U-Net with FiLM conditioning from OpenCLIP text
 embeddings.
 
+The implementation follows the main paper design:
+
+- OpenCLIP voxel features are the 3D visual input.
+- Frozen OpenCLIP text embeddings condition the predictor.
+- FiLM layers modulate U-Net features at multiple scales.
+- The physics loss is masked to occupied voxels.
+- `rho` and `E` are learned in log space, while `nu` is learned linearly.
+
 ## Contents
 
 - `autophyx/model.py` - OpenCLIP text encoder, FiLM layers, Pixie-style U-Net,
@@ -30,6 +38,8 @@ embeddings.
   JSON augmentations.
 - `scripts/validate_checkpoint.py` - Evaluates a saved checkpoint on held-out
   objects.
+- `scripts/export_prediction.py` - Exports one checkpoint prediction to both
+  normalized targets and raw `rho/E/nu` physical units.
 - `scripts/summarize_pixieverse_properties.py` - Summarizes base and augmented
   material-property distributions into CSV.
 - `docs/pixieverse_v7_log_excerpt.md` - Preserved training-log excerpt from the
@@ -68,6 +78,12 @@ emb_root/
 ```
 
 Voxel features are expected to be `[64, 64, 64, 768]`.
+
+Model targets and exported physical predictions use this channel order:
+
+```text
+[rho, E, nu]
+```
 
 ## Property Distribution CSV
 
@@ -142,6 +158,29 @@ python scripts/validate_checkpoint.py \
   --aug-root /path/to/pixieverse_aug_json \
   --emb-root /path/to/pixieverse_text_emb
 ```
+
+Export a single prediction:
+
+```bash
+python scripts/export_prediction.py \
+  --checkpoint ./checkpoints_pixieverse/run/best.pth \
+  --features /path/to/features/<obj_id>/clip_features_features.npy \
+  --text-embedding /path/to/pixieverse_text_emb/<obj_id>/augment_0.pt \
+  --output ./prediction_<obj_id>.npz
+```
+
+The `.npz` contains:
+
+```text
+pred_normalized  # [3, D, H, W], training target space
+pred_physical    # [D, H, W, 3], raw [rho, E, nu]
+physical_channels
+```
+
+New checkpoints include `model_config` and `val_metrics`, so validation and
+export scripts can recover model dimensions without guessing. Older checkpoints
+still load with the default `clip_feature_dim=768`, `text_dim=768`, and
+`base_channels=64`.
 
 ## Notes
 

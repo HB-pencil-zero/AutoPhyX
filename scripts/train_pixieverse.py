@@ -5,8 +5,6 @@ from __future__ import annotations
 
 import argparse
 import logging
-import os
-import random
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -18,17 +16,22 @@ from torch.utils.data import DataLoader, Subset
 from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from autophyx.data import PixieVerseJsonDataset, masked_mse
+from autophyx.data import PixieVerseJsonDataset, masked_channel_mse, masked_mse, split_indices_by_object
 from autophyx.model import TextConditionedPropertyPredictor
 
 logger = logging.getLogger(__name__)
 
 
 @torch.no_grad()
-def evaluate(model: TextConditionedPropertyPredictor, loader: DataLoader, device: torch.device) -> float:
+def evaluate(
+    model: TextConditionedPropertyPredictor,
+    loader: DataLoader,
+    device: torch.device,
+) -> dict[str, float]:
     model.eval()
     total = 0.0
     count = 0
+    channel_totals = {"rho": 0.0, "E": 0.0, "nu": 0.0}
     for batch in loader:
         feat = batch["features"].to(device)
         target = batch["target"].to(device)
@@ -38,20 +41,33 @@ def evaluate(model: TextConditionedPropertyPredictor, loader: DataLoader, device
         loss = masked_mse(pred, target, mask)
         if torch.isfinite(loss):
             total += loss.item() * feat.size(0)
+            channel_loss = masked_channel_mse(pred, target, mask)
+            for key in channel_totals:
+                channel_totals[key] += channel_loss[key].item() * feat.size(0)
             count += feat.size(0)
     model.train()
-    return total / max(count, 1)
+    denom = max(count, 1)
+    return {
+        "loss": total / denom,
+        "rho": channel_totals["rho"] / denom,
+        "E": channel_totals["E"] / denom,
+        "nu": channel_totals["nu"] / denom,
+    }
 
 
 def split_by_object(dataset: PixieVerseJsonDataset, train_fraction: float, seed: int) -> tuple[Subset, Subset]:
-    obj_ids = list(dataset.object_ids())
-    rng = random.Random(seed)
-    rng.shuffle(obj_ids)
-    n_train = int(len(obj_ids) * train_fraction)
-    train_objs = set(obj_ids[:n_train])
-    train_idx = [idx for idx, sample in enumerate(dataset.samples) if sample[0] in train_objs]
-    val_idx = [idx for idx, sample in enumerate(dataset.samples) if sample[0] not in train_objs]
+    train_idx, val_idx = split_indices_by_object(dataset, train_fraction, seed)
     return Subset(dataset, train_idx), Subset(dataset, val_idx)
+
+
+def model_config(args: argparse.Namespace) -> dict[str, int | bool]:
+    return {
+        "clip_feature_dim": args.clip_feature_dim,
+        "text_dim": args.text_dim,
+        "base_channels": args.base_channels,
+        "out_channels": 3,
+        "freeze_text_encoder": True,
+    }
 
 
 def train(args: argparse.Namespace) -> None:
@@ -84,6 +100,8 @@ def train(args: argparse.Namespace) -> None:
 
     model = TextConditionedPropertyPredictor(
         clip_feature_dim=args.clip_feature_dim,
+        text_dim=args.text_dim,
+        base_channels=args.base_channels,
         freeze_text_encoder=True,
     ).to(device)
     if args.resume:
@@ -133,12 +151,28 @@ def train(args: argparse.Namespace) -> None:
             progress.set_postfix(loss=f"{loss.item():.4f}")
 
         scheduler.step()
-        val = evaluate(model, val_loader, device)
+        val_metrics = evaluate(model, val_loader, device)
+        val = val_metrics["loss"]
         train_loss = epoch_loss / max(finite_steps, 1)
-        logger.info("E %d | train=%.4f val=%.4f (nan=%d)", epoch + 1, train_loss, val, nan_skips)
+        logger.info(
+            "E %d | train=%.4f val=%.4f rho=%.4f E=%.4f nu=%.4f (nan=%d)",
+            epoch + 1,
+            train_loss,
+            val,
+            val_metrics["rho"],
+            val_metrics["E"],
+            val_metrics["nu"],
+            nan_skips,
+        )
         sys.stderr.flush()
 
-        ckpt = {"epoch": epoch + 1, "model": model.state_dict(), "val_loss": val}
+        ckpt = {
+            "epoch": epoch + 1,
+            "model": model.state_dict(),
+            "val_loss": val,
+            "val_metrics": val_metrics,
+            "model_config": model_config(args),
+        }
         torch.save(ckpt, ckpt_dir / "latest.pth")
         if val < best_val:
             best_val = val
@@ -165,6 +199,8 @@ def main() -> None:
     parser.add_argument("--weight-decay", type=float, default=1e-5)
     parser.add_argument("--grad-clip", type=float, default=1.0)
     parser.add_argument("--clip-feature-dim", type=int, default=768)
+    parser.add_argument("--text-dim", type=int, default=768)
+    parser.add_argument("--base-channels", type=int, default=64)
     parser.add_argument("--train-fraction", type=float, default=0.85)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--max-objects", type=int, default=0)
