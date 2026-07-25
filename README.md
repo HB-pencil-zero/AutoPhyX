@@ -2,6 +2,10 @@
 
 AutoPhyX-style text-conditioned physics property prediction.
 
+[Project Page](https://hb-pencil-zero.github.io/AutoPhyX/) |
+[Paper](static/paper/autophyx.pdf) |
+[PixieVerse Data](https://huggingface.co/datasets/hbpencil01/pixieverse)
+
 This repository contains the training and data augmentation scripts used for
 PixieVerse/VoMP-style experiments where 3D visual voxel features are conditioned
 on natural-language physical descriptions. The model predicts dense voxel-level

@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AutoPhyX predicts dense, text-conditioned physical properties for 3D assets in a single forward pass.">
+  <meta name="keywords" content="AutoPhyX, 3D physics, physical properties, text conditioning, Gaussian Splatting, FEM, MPM">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AutoPhyX: Automatic Text-Condition Physics Property Generation">
+  <meta property="og:description" content="Fast, controllable physical property prediction for 3D assets.">
+  <meta property="og:image" content="static/images/hero-poster.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>AutoPhyX | Text-Conditioned 3D Physics</title>
+  <link rel="icon" href="static/images/hero-poster.jpg">
+  <link rel="stylesheet" href="static/css/site.css">
+  <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script defer src="static/js/site.js"></script>
+</head>
+<body>
+  <header class="site-header" data-header>
+    <a class="brand" href="#top" aria-label="AutoPhyX home">AutoPhyX</a>
+    <button class="icon-button menu-button" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-button>
+      <i data-lucide="menu" aria-hidden="true"></i>
+    </button>
+    <nav class="site-nav" aria-label="Primary navigation" data-menu>
+      <a href="#overview">Overview</a>
+      <a href="#results">Results</a>
+      <a href="#method">Method</a>
+      <a href="#dataset">Dataset</a>
+      <a href="#benchmarks">Benchmarks</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="static/images/hero-poster.jpg">
+        <source src="static/videos/hero-teaser.mp4" type="video/mp4">
+      </video>
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="eyebrow">Anonymous ECCV 2026 Submission #7088</p>
+        <h1 id="hero-title">AutoPhyX</h1>
+        <p class="hero-subtitle">Automatic Text-Condition Physics Property Generation</p>
+        <p class="hero-summary">Turn a 3D asset and a physical description into a dense, simulation-ready material field in one forward pass.</p>
+        <div class="hero-actions" aria-label="Project resources">
+          <a class="button button-primary" href="static/paper/autophyx.pdf">
+            <i data-lucide="file-text" aria-hidden="true"></i>
+            Paper
+          </a>
+          <a class="button button-secondary" href="https://github.com/HB-pencil-zero/AutoPhyX">
+            <i data-lucide="code-2" aria-hidden="true"></i>
+            Code
+          </a>
+          <a class="button button-secondary" href="https://huggingface.co/datasets/hbpencil01/pixieverse">
+            <i data-lucide="database" aria-hidden="true"></i>
+            Data
+          </a>
+        </div>
+      </div>
+      <a class="hero-next" href="#overview">
+        <span>Explore the work</span>
+        <i data-lucide="arrow-down" aria-hidden="true"></i>
+      </a>
+    </section>
+
+    <section class="section section-intro" id="overview">
+      <div class="section-inner intro-grid">
+        <div>
+          <p class="section-kicker">Why text matters</p>
+          <h2>Appearance alone does not determine physics.</h2>
+        </div>
+        <div class="abstract-copy">
+          <p>A rubber object and a rigid plastic replica can look nearly identical. AutoPhyX resolves this ambiguity by conditioning dense 3D physical property prediction on language, coupling semantic intent with spatial visual features.</p>
+          <p>The resulting voxel field predicts Young's modulus, Poisson's ratio, and density. It transfers across meshes, point clouds, Gaussian Splatting, and NeRF, and can drive both MPM and FEM simulations.</p>
+        </div>
+      </div>
+      <figure class="wide-figure section-inner">
+        <img src="static/images/text-driven-overview.webp" alt="The same bonsai and box exhibit different physical behavior under different text descriptions." loading="lazy">
+        <figcaption>Text descriptions disambiguate physically different states under identical visual appearance and boundary conditions.</figcaption>
+      </figure>
+    </section>
+
+    <section class="metric-band" aria-label="Key project metrics">
+      <div class="metric-inner">
+        <div class="metric"><strong>26.012</strong><span>PSNR on Text2PhyX</span></div>
+        <div class="metric"><strong>&lt; 2 s</strong><span>Forward inference</span></div>
+        <div class="metric"><strong>1,700</strong><span>Curated 3D assets</span></div>
+        <div class="metric"><strong>8x</strong><span>Conditions per asset</span></div>
+      </div>
+    </section>
+
+    <section class="section results-section" id="results">
+      <div class="section-inner">
+        <div class="section-heading centered-heading">
+          <p class="section-kicker">Text-controlled dynamics</p>
+          <h2>One object. Different physics.</h2>
+          <p>Select a scene to compare simulations under the same setup with different text-conditioned properties.</p>
+        </div>
+
+        <div class="segmented-control" role="tablist" aria-label="Select a simulation scene">
+          <button type="button" role="tab" aria-selected="true" data-result="ficus">Bonsai</button>
+          <button type="button" role="tab" aria-selected="false" data-result="plane">Propeller</button>
+          <button type="button" role="tab" aria-selected="false" data-result="toast">Toast</button>
+          <button type="button" role="tab" aria-selected="false" data-result="softbody">Soft body</button>
+          <button type="button" role="tab" aria-selected="false" data-result="can">Can</button>
+          <button type="button" role="tab" aria-selected="false" data-result="banana">Banana</button>
+        </div>
+
+        <div class="comparison-tool" aria-live="polite">
+          <article class="comparison-pane">
+            <div class="video-frame">
+              <video muted loop playsinline autoplay preload="metadata" data-video-left>
+                <source src="static/videos/ficus-stiff.mp4" type="video/mp4">
+              </video>
+              <span class="condition-label">Condition A</span>
+            </div>
+            <h3 data-title-left>Stiff stems</h3>
+            <p data-description-left>The potted plant stays upright and shows only minor shifts in the wind.</p>
+          </article>
+          <article class="comparison-pane">
+            <div class="video-frame">
+              <video muted loop playsinline autoplay preload="metadata" data-video-right>
+                <source src="static/videos/ficus-flexible.mp4" type="video/mp4">
+              </video>
+              <span class="condition-label condition-label-alt">Condition B</span>
+            </div>
+            <h3 data-title-right>Flexible stems</h3>
+            <p data-description-right>The plant undergoes pronounced flexible bending and sways deeply to the side.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section method-section" id="method">
+      <div class="section-inner">
+        <div class="section-heading">
+          <p class="section-kicker">Method</p>
+          <h2>Language modulates a physics-ready 3D field.</h2>
+        </div>
+        <figure class="method-figure">
+          <img src="static/images/method-overview.webp" alt="AutoPhyX pipeline from a 3D object and text through feature extraction and FiLM U-Net to predicted physical properties." loading="lazy">
+        </figure>
+        <div class="method-steps">
+          <article>
+            <span>01</span>
+            <h3>Extract</h3>
+            <p>Render multi-view OpenCLIP features into a spatially coherent 3D voxel field.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Modulate</h3>
+            <p>Apply text-conditioned FiLM transformations across multiple 3D U-Net scales.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Predict</h3>
+            <p>Regress dense fields for Young's modulus, Poisson's ratio, and density.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Simulate</h3>
+            <p>Transfer the voxel properties to GS, mesh, or point representations for MPM and FEM.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section feature-section">
+      <div class="section-inner feature-grid">
+        <div class="section-heading">
+          <p class="section-kicker">Volumetric grounding</p>
+          <h2>Preserve structure, including what the camera cannot see.</h2>
+          <p>A NeRF-style feature extraction stage accounts for visibility instead of directly averaging multi-view features. Hierarchical ray tests then fill internal voxels for a complete physical volume.</p>
+          <ul class="check-list">
+            <li><i data-lucide="check" aria-hidden="true"></i> Visibility-aware OpenCLIP features</li>
+            <li><i data-lucide="check" aria-hidden="true"></i> Hierarchical internal voxel filling</li>
+            <li><i data-lucide="check" aria-hidden="true"></i> Representation-independent output</li>
+          </ul>
+        </div>
+        <figure>
+          <img src="static/images/feature-extraction.webp" alt="Comparison of volumetric feature extraction and the hierarchical internal voxel filling process." loading="lazy">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section dataset-section" id="dataset">
+      <div class="section-inner dataset-layout">
+        <div class="section-heading">
+          <p class="section-kicker">Text2PhyX</p>
+          <h2>Part-aware supervision at dataset scale.</h2>
+          <p>The automated data pipeline decomposes complex assets into semantic parts, retrieves plausible material ranges from engineering sources, and generates diverse text-property pairs for each asset.</p>
+          <a class="text-link" href="https://huggingface.co/datasets/hbpencil01/pixieverse">
+            Browse the available PixieVerse data mirror
+            <i data-lucide="arrow-up-right" aria-hidden="true"></i>
+          </a>
+        </div>
+        <dl class="dataset-facts">
+          <div><dt>Assets</dt><dd>1,700</dd></div>
+          <div><dt>Triplets</dt><dd>13,600</dd></div>
+          <div><dt>Properties</dt><dd>E, nu, rho</dd></div>
+          <div><dt>Evaluation</dt><dd>Text2PhyX + ABO-500</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="section benchmark-section" id="benchmarks">
+      <div class="section-inner">
+        <div class="section-heading centered-heading">
+          <p class="section-kicker">Quantitative results</p>
+          <h2>Higher fidelity and lower physical error.</h2>
+          <p>AutoPhyX with OpenCLIP achieves the strongest reported performance across rendering and physical-property metrics on Text2PhyX.</p>
+        </div>
+        <div class="table-wrap" tabindex="0" aria-label="Text2PhyX benchmark results">
+          <table>
+            <thead>
+              <tr><th>Method</th><th>PSNR up</th><th>SSIM up</th><th>LPIPS down</th><th>Avg. physics error down</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>NeRF2Physics</td><td>18.554</td><td>0.889</td><td>0.245</td><td>0.841</td></tr>
+              <tr><td>Gemini (avg.)</td><td>21.124</td><td>0.869</td><td>0.205</td><td>0.218</td></tr>
+              <tr><td>Pixie (CLIP)</td><td>23.421</td><td>0.908</td><td>0.092</td><td>0.078</td></tr>
+              <tr><td>AutoPhyX (CLIP)</td><td>25.105</td><td>0.916</td><td>0.091</td><td>0.069</td></tr>
+              <tr class="best-row"><td>AutoPhyX (OpenCLIP)</td><td>26.012</td><td>0.921</td><td>0.089</td><td>0.059</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="abo-callout">
+          <div>
+            <span>ABO-500</span>
+            <strong>9.433</strong>
+            <p>Average displacement error, down from 11.826 and 12.565 for prior baselines.</p>
+          </div>
+          <div>
+            <span>Runtime</span>
+            <strong>2 seconds</strong>
+            <p>Single-pass inference, compared with minutes to hours for per-scene optimization.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section citation-section" id="citation">
+      <div class="section-inner citation-layout">
+        <div class="section-heading">
+          <p class="section-kicker">Citation</p>
+          <h2>AutoPhyX</h2>
+          <p>This manuscript is currently an anonymous ECCV 2026 submission. Author information is intentionally omitted.</p>
+        </div>
+        <div class="citation-block">
+          <button class="icon-button copy-button" type="button" aria-label="Copy BibTeX" data-copy-citation>
+            <i data-lucide="copy" aria-hidden="true"></i>
+          </button>
+          <pre><code data-citation>@inproceedings{anonymous2026autophyx,
+  title     = {AutoPhyX: Automatic Text-Condition Physics Property Generation},
+  author    = {Anonymous},
+  booktitle = {ECCV},
+  year      = {2026}
+}</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>AutoPhyX</strong>
+      <span>Text-conditioned physical property generation for 3D assets.</span>
+    </div>
+    <div class="footer-links">
+      <a href="static/paper/autophyx.pdf">Paper</a>
+      <a href="https://github.com/HB-pencil-zero/AutoPhyX">GitHub</a>
+      <a href="#top">Back to top</a>
+    </div>
+  </footer>
+</body>
+</html>
