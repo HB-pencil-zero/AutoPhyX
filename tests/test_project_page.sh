@@ -6,6 +6,7 @@ cd "$repo_root"
 
 rg -q 'static/images/data-generation.webp' index.html
 rg -q 'width="700" height="238"' index.html
+rg -U -q '\.dataset-figure img \{[^}]*height: auto;' static/css/site.css
 rg -q 'data-step="segment"' index.html
 rg -q 'data-step="describe"' index.html
 rg -q 'data-step="assign"' index.html
