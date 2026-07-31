@@ -123,7 +123,6 @@ video {
 .icon-button svg,
 .button svg,
 .text-link svg,
-.check-list svg,
 .hero-next svg {
   width: 18px;
   height: 18px;
@@ -281,7 +280,6 @@ video {
 }
 
 .intro-grid,
-.feature-grid,
 .dataset-layout,
 .citation-layout {
   display: grid;
@@ -316,8 +314,7 @@ video {
 }
 
 .wide-figure img,
-.method-figure img,
-.feature-grid figure img {
+.method-figure img {
   width: 100%;
   background: #fff;
 }
@@ -499,45 +496,76 @@ figcaption {
   font-size: 0.88rem;
 }
 
-.feature-section {
-  background: #17201e;
-  color: #fff;
+.volumetric-section {
+  background: var(--wash);
 }
 
-.feature-grid {
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  align-items: center;
+.volumetric-heading {
+  max-width: 760px;
+  margin-bottom: 64px;
 }
 
-.feature-grid .section-heading > p:not(.section-kicker) {
-  color: rgba(255, 255, 255, 0.66);
+.volumetric-heading h2 {
+  max-width: 720px;
+  font-size: clamp(2.35rem, 4vw, 3.75rem);
 }
 
-.feature-grid figure {
+.volumetric-heading > p:not(.section-kicker) {
+  max-width: 650px;
+  margin-top: 20px;
+}
+
+.volumetric-stages {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+}
+
+.volumetric-stage {
+  min-width: 0;
   margin: 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--ink);
+}
+
+.volumetric-stage-media {
   overflow: hidden;
   background: #fff;
-  border-radius: 8px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
 }
 
-.check-list {
+.volumetric-stage-media img {
+  width: 100%;
+  height: auto;
+}
+
+.volumetric-stage figcaption {
   display: grid;
-  gap: 10px;
-  margin: 28px 0 0;
-  padding: 0;
-  list-style: none;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 18px;
 }
 
-.check-list li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.stage-index {
+  padding-top: 5px;
+  color: var(--coral);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.volumetric-stage h3 {
+  margin: 0 0 6px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.42rem;
+  line-height: 1.18;
+}
+
+.volumetric-stage p {
+  margin: 0;
+  color: var(--muted);
   font-size: 0.9rem;
-  font-weight: 650;
-}
-
-.check-list svg {
-  color: #73d4bf;
 }
 
 .dataset-layout {
@@ -808,7 +836,6 @@ tbody tr:last-child td {
   }
 
   .intro-grid,
-  .feature-grid,
   .dataset-layout,
   .citation-layout {
     grid-template-columns: 1fr;
@@ -819,9 +846,6 @@ tbody tr:last-child td {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .feature-grid figure {
-    order: -1;
-  }
 }
 
 @media (max-width: 640px) {
@@ -905,9 +929,14 @@ tbody tr:last-child td {
   }
 
   .method-steps,
+  .volumetric-stages,
   .dataset-process,
   .abo-callout {
     grid-template-columns: 1fr;
+  }
+
+  .volumetric-heading {
+    margin-bottom: 42px;
   }
 
   .dataset-process {

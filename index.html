@@ -12,7 +12,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>AutoPhyX | Text-Conditioned 3D Physics</title>
   <link rel="icon" href="static/images/hero-poster.jpg">
-  <link rel="stylesheet" href="static/css/site.css?v=20260731">
+  <link rel="stylesheet" href="static/css/site.css?v=20260731-volumetric">
   <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script defer src="static/js/site.js"></script>
 </head>
@@ -156,21 +156,39 @@
       </div>
     </section>
 
-    <section class="section feature-section">
-      <div class="section-inner feature-grid">
-        <div class="section-heading">
+    <section class="section volumetric-section" id="volumetric-grounding">
+      <div class="section-inner">
+        <div class="section-heading volumetric-heading">
           <p class="section-kicker">Volumetric grounding</p>
-          <h2>Preserve structure, including what the camera cannot see.</h2>
-          <p>A NeRF-style feature extraction stage accounts for visibility instead of directly averaging multi-view features. Hierarchical ray tests then fill internal voxels for a complete physical volume.</p>
-          <ul class="check-list">
-            <li><i data-lucide="check" aria-hidden="true"></i> Visibility-aware OpenCLIP features</li>
-            <li><i data-lucide="check" aria-hidden="true"></i> Hierarchical internal voxel filling</li>
-            <li><i data-lucide="check" aria-hidden="true"></i> Representation-independent output</li>
-          </ul>
+          <h2>From visible surfaces to a complete 3D field.</h2>
+          <p>AutoPhyX keeps semantic structure intact while lifting multi-view features into a physics-ready volume. A second pass fills the interior that cameras cannot observe.</p>
         </div>
-        <figure>
-          <img src="static/images/feature-extraction.webp" alt="Comparison of volumetric feature extraction and the hierarchical internal voxel filling process." loading="lazy">
-        </figure>
+        <div class="volumetric-stages">
+          <figure class="volumetric-stage">
+            <div class="volumetric-stage-media">
+              <img src="static/images/visibility-extraction.webp" width="1817" height="692" alt="A bonsai object compared with direct VoMP feature extraction and AutoPhyX visibility-aware extraction." loading="lazy">
+            </div>
+            <figcaption>
+              <span class="stage-index">01</span>
+              <div>
+                <h3>Visibility-aware extraction</h3>
+                <p>Volume rendering separates pot, trunk, and leaves instead of blending features from occluded views.</p>
+              </div>
+            </figcaption>
+          </figure>
+          <figure class="volumetric-stage">
+            <div class="volumetric-stage-media">
+              <img src="static/images/interior-filling.webp" width="1508" height="931" alt="Two ray-casting conditions used to classify and fill interior voxels inside a shape." loading="lazy">
+            </div>
+            <figcaption>
+              <span class="stage-index">02</span>
+              <div>
+                <h3>Interior completion</h3>
+                <p>Coarse enclosure checks and ray-surface intersections recover a solid volume through complex concavities.</p>
+              </div>
+            </figcaption>
+          </figure>
+        </div>
       </div>
     </section>
 
