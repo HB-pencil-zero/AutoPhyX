@@ -12,7 +12,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>AutoPhyX | Text-Conditioned 3D Physics</title>
   <link rel="icon" href="static/images/hero-poster.jpg">
-  <link rel="stylesheet" href="static/css/site.css?v=20260731-volumetric">
+  <link rel="stylesheet" href="static/css/site.css?v=20260731-aligned">
   <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script defer src="static/js/site.js"></script>
 </head>
@@ -170,9 +170,10 @@
             </div>
             <figcaption>
               <span class="stage-index">01</span>
-              <div>
+              <div class="stage-copy">
                 <h3>Visibility-aware extraction</h3>
-                <p>Volume rendering separates pot, trunk, and leaves instead of blending features from occluded views.</p>
+                <p>AutoPhyX extracts dense 2D OpenCLIP features from multi-view renders, then lifts them into a continuous 3D feature field through differentiable NeRF-style volume rendering.</p>
+                <p>Unlike VoMP-style direct averaging, the accumulated transmittance along each camera ray suppresses samples behind visible surfaces. This prevents foreground leaves from contaminating an occluded trunk and preserves spatial and semantic consistency.</p>
               </div>
             </figcaption>
           </figure>
@@ -182,9 +183,10 @@
             </div>
             <figcaption>
               <span class="stage-index">02</span>
-              <div>
+              <div class="stage-copy">
                 <h3>Interior completion</h3>
-                <p>Coarse enclosure checks and ray-surface intersections recover a solid volume through complex concavities.</p>
+                <p>Surface features alone leave the object hollow, while simulation requires Young's modulus, Poisson's ratio, and density throughout the interior. AutoPhyX begins with six-direction boundary checks to find coarse enclosed candidates.</p>
+                <p>It then applies the even-odd rule: rays cast to infinity must intersect the surface an odd number of times for a voxel to be considered inside. Accepted voxels receive semantic features through nearest-neighbor interpolation from the surface, producing a solid, physics-ready volume.</p>
               </div>
             </figcaption>
           </figure>

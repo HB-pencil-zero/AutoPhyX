@@ -517,9 +517,9 @@ figcaption {
 
 .volumetric-stages {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(32px, 5vw, 72px);
-  align-items: start;
+  align-items: stretch;
 }
 
 .volumetric-stage {
@@ -530,6 +530,9 @@ figcaption {
 }
 
 .volumetric-stage-media {
+  aspect-ratio: 16 / 9;
+  display: grid;
+  place-items: center;
   overflow: hidden;
   background: #fff;
   border: 1px solid var(--line);
@@ -538,7 +541,8 @@ figcaption {
 
 .volumetric-stage-media img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
 }
 
 .volumetric-stage figcaption {
@@ -566,6 +570,10 @@ figcaption {
   margin: 0;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.stage-copy p + p {
+  margin-top: 12px;
 }
 
 .dataset-layout {
@@ -846,6 +854,18 @@ tbody tr:last-child td {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .volumetric-stages {
+    grid-template-columns: 1fr;
+  }
+
+  .volumetric-stage-media {
+    aspect-ratio: auto;
+  }
+
+  .volumetric-stage-media img {
+    height: auto;
+  }
+
 }
 
 @media (max-width: 640px) {
@@ -929,7 +949,6 @@ tbody tr:last-child td {
   }
 
   .method-steps,
-  .volumetric-stages,
   .dataset-process,
   .abo-callout {
     grid-template-columns: 1fr;
