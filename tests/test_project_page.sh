@@ -5,6 +5,7 @@ repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$repo_root"
 
 rg -q 'static/images/data-generation.webp' index.html
+rg -Fq 'static/css/site.css?v=20260731' index.html
 rg -q 'width="700" height="238"' index.html
 rg -U -q '\.dataset-figure img \{[^}]*height: auto;' static/css/site.css
 rg -q 'data-step="segment"' index.html
