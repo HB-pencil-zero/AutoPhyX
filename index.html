@@ -80,15 +80,6 @@
       </figure>
     </section>
 
-    <section class="metric-band" aria-label="Key project metrics">
-      <div class="metric-inner">
-        <div class="metric"><strong>26.012</strong><span>PSNR on Text2Physics</span></div>
-        <div class="metric"><strong>&lt; 2 s</strong><span>Forward inference</span></div>
-        <div class="metric"><strong>1,700</strong><span>Curated 3D assets</span></div>
-        <div class="metric"><strong>8x</strong><span>Conditions per asset</span></div>
-      </div>
-    </section>
-
     <section class="section results-section" id="results">
       <div class="section-inner">
         <div class="section-heading centered-heading">
@@ -185,21 +176,38 @@
 
     <section class="section dataset-section" id="dataset">
       <div class="section-inner dataset-layout">
-        <div class="section-heading">
+        <div class="section-heading dataset-copy">
           <p class="section-kicker">Text2Physics</p>
-          <h2>Part-aware supervision at dataset scale.</h2>
-          <p>The automated data pipeline decomposes complex assets into semantic parts, retrieves plausible material ranges from engineering sources, and generates diverse text-property pairs for each asset.</p>
+          <h2>Build physics from the parts up.</h2>
+          <p>Each asset is decomposed into semantic 3D parts before any physical property is assigned. Language then specifies which parts change and how, turning one object into multiple grounded supervision examples.</p>
           <a class="text-link" href="https://huggingface.co/datasets/hbpencil01/pixieverse">
             Browse the available Text2Physics dataset
             <i data-lucide="arrow-up-right" aria-hidden="true"></i>
           </a>
         </div>
-        <dl class="dataset-facts">
-          <div><dt>Assets</dt><dd>1,700</dd></div>
-          <div><dt>Triplets</dt><dd>13,600</dd></div>
-          <div><dt>Properties</dt><dd>E, nu, rho</dd></div>
-          <div><dt>Evaluation</dt><dd>Text2Physics + ABO-500</dd></div>
-        </dl>
+        <div class="dataset-visual">
+          <figure class="dataset-figure">
+            <img src="static/images/data-generation.webp" width="700" height="238" alt="Text2Physics data generation from engineering databases through semantic part labels to dense ground-truth physical properties." loading="lazy">
+            <figcaption>Engineering references constrain the valid material ranges before properties are grounded to semantic 3D parts.</figcaption>
+          </figure>
+          <ol class="dataset-process" aria-label="Part-aware data generation steps">
+            <li data-step="segment">
+              <span>01</span>
+              <h3>Segment</h3>
+              <p>Part names are grounded in 3D OpenCLIP voxels and selected from multiple segmentation candidates.</p>
+            </li>
+            <li data-step="describe">
+              <span>02</span>
+              <h3>Describe</h3>
+              <p>Selected parts receive diverse, physically plausible language conditions.</p>
+            </li>
+            <li data-step="assign">
+              <span>03</span>
+              <h3>Assign</h3>
+              <p>Authoritative sources define valid ranges for Young's modulus, Poisson's ratio, and density.</p>
+            </li>
+          </ol>
+        </div>
       </div>
     </section>
 
