@@ -4,7 +4,7 @@ set -euo pipefail
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$repo_root"
 
-rg -q 'static/images/data-generation.webp' index.html
+rg -Fq 'static/images/data-generation.webp?v=20260801-hires' index.html
 rg -Fq 'static/css/site.css?v=20260801-citation-refine' index.html
 rg -q 'Cite this work\.' index.html
 rg -q 'class="citation-block-header"' index.html
@@ -26,7 +26,7 @@ if rg -q 'Appearance alone does not determine physics|class="section-inner intro
   echo "legacy oversized overview heading or split layout is still present" >&2
   exit 1
 fi
-rg -q 'width="700" height="238"' index.html
+rg -q 'width="3474" height="1218"' index.html
 rg -U -q '\.dataset-figure img \{[^}]*height: auto;' static/css/site.css
 rg -q 'data-step="segment"' index.html
 rg -q 'data-step="describe"' index.html
