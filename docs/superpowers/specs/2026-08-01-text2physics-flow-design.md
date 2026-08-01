@@ -4,6 +4,8 @@
 
 Make the Text2Physics section explain, at a glance, how a 3D asset becomes a text-conditioned, simulation-ready training example. The current cropped paper image is too low-resolution to communicate that process.
 
+Apply the same principle to the adjacent Results and Method sections: typography and scale must communicate a specific claim, rather than filling space or decorating a metric.
+
 ## User-Facing Explanation
 
 The visual explains this data-generation path:
@@ -45,7 +47,16 @@ Output strip: `Voxel field: density rho | Young's modulus E | Poisson's ratio nu
 - Retain the `#dataset` anchor, Text2Physics copy, and dataset link.
 - Remove the paper-crop figure and its three-item explanatory rail.
 - Keep the section within the established desktop and mobile container widths.
-- Do not change the Results, Method, Benchmark, or navigation sections.
+- In Results, replace the oversized, context-free metric panels with compact evidence notes that name the metric, comparison baseline, and interpretation. Reserve bold and display-scale type for the best-performing method and the evidence-backed conclusion above the table.
+- Align the Results summary, table, and evidence notes to one shared content grid; the two evidence notes must have equal width, height, padding, and text rhythm.
+- In Method and Dataset, use the same two-column section grid so copy and visual panels share top and bottom alignment.
+- Do not change the Benchmark data, navigation, or page palette.
+
+## Typography Rules
+
+- Display type is used only for the page title and section-level claims that summarize a verified result.
+- Bold is used only for the winning method, a named stage in the data flow, or a numerical result accompanied by its metric and comparison context.
+- Labels and short descriptions remain regular weight. Do not enlarge a value when the reader cannot infer why it matters from its immediate context.
 
 ## Verification
 
