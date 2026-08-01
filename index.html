@@ -12,7 +12,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>AutoPhyX | Text-Conditioned 3D Physics</title>
   <link rel="icon" href="static/images/hero-poster.jpg">
-  <link rel="stylesheet" href="static/css/site.css?v=20260731-aligned">
+  <link rel="stylesheet" href="static/css/site.css?v=20260801-hierarchy">
   <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script defer src="static/js/site.js"></script>
 </head>
@@ -196,38 +196,37 @@
 
     <section class="section dataset-section" id="dataset">
       <div class="section-inner dataset-layout">
-        <div class="section-heading dataset-copy">
+        <div class="section-heading dataset-heading">
           <p class="section-kicker">Text2Physics</p>
-          <h2>Build physics from the parts up.</h2>
-          <p>Each asset is decomposed into semantic 3D parts before any physical property is assigned. Language then specifies which parts change and how, turning one object into multiple grounded supervision examples.</p>
+          <h2>Part-aware supervision for text-conditioned physics.</h2>
+          <p>Text2Physics contains 1,700 3D assets, each paired with eight text-and-property annotations. The same geometry can therefore represent multiple plausible physical interpretations instead of one fixed material assignment.</p>
+          <p>Every annotation is grounded to semantic 3D parts before Young's modulus, Poisson's ratio, and density are assigned from engineering references.</p>
           <a class="text-link" href="https://huggingface.co/datasets/hbpencil01/pixieverse">
             Browse the available Text2Physics dataset
             <i data-lucide="arrow-up-right" aria-hidden="true"></i>
           </a>
         </div>
-        <div class="dataset-visual">
-          <figure class="dataset-figure">
-            <img src="static/images/data-generation.webp" width="700" height="238" alt="Text2Physics data generation from engineering databases through semantic part labels to dense ground-truth physical properties." loading="lazy">
-            <figcaption>Engineering references constrain the valid material ranges before properties are grounded to semantic 3D parts.</figcaption>
-          </figure>
-          <ol class="dataset-process" aria-label="Part-aware data generation steps">
-            <li data-step="segment">
-              <span>01</span>
-              <h3>Segment</h3>
-              <p>Part names are grounded in 3D OpenCLIP voxels and selected from multiple segmentation candidates.</p>
-            </li>
-            <li data-step="describe">
-              <span>02</span>
-              <h3>Describe</h3>
-              <p>Selected parts receive diverse, physically plausible language conditions.</p>
-            </li>
-            <li data-step="assign">
-              <span>03</span>
-              <h3>Assign</h3>
-              <p>Authoritative sources define valid ranges for Young's modulus, Poisson's ratio, and density.</p>
-            </li>
-          </ol>
-        </div>
+        <figure class="dataset-figure">
+          <img src="static/images/data-generation.webp" width="700" height="238" alt="Text2Physics data generation from engineering databases through semantic part labels to dense ground-truth physical properties." loading="lazy">
+          <figcaption>The generation pipeline combines engineering references, OpenCLIP part labels, and VLM-guided property assignment to produce dense, part-aware supervision.</figcaption>
+        </figure>
+        <ol class="dataset-process" aria-label="Part-aware data generation steps">
+          <li data-step="segment">
+            <span>01</span>
+            <h3>Segment</h3>
+            <p>Render 15 upper-hemisphere views, generate five part-keyword sets, and select the most coherent OpenCLIP voxel result from five segmentation candidates.</p>
+          </li>
+          <li data-step="describe">
+            <span>02</span>
+            <h3>Describe</h3>
+            <p>Randomly select a subset of parts and generate diverse, physically plausible language conditions so one asset can express multiple material interpretations.</p>
+          </li>
+          <li data-step="assign">
+            <span>03</span>
+            <h3>Assign</h3>
+            <p>Query MatWeb, Wikipedia, and The Engineering Toolbox for valid ranges, then assign Young's modulus, Poisson's ratio, and density consistently with each description.</p>
+          </li>
+        </ol>
       </div>
     </section>
 

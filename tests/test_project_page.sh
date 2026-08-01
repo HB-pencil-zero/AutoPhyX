@@ -5,13 +5,25 @@ repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$repo_root"
 
 rg -q 'static/images/data-generation.webp' index.html
-rg -Fq 'static/css/site.css?v=20260731-aligned' index.html
+rg -Fq 'static/css/site.css?v=20260801-hierarchy' index.html
 rg -q 'width="700" height="238"' index.html
 rg -U -q '\.dataset-figure img \{[^}]*height: auto;' static/css/site.css
 rg -q 'data-step="segment"' index.html
 rg -q 'data-step="describe"' index.html
 rg -q 'data-step="assign"' index.html
 test -f static/images/data-generation.webp
+rg -q 'Part-aware supervision for text-conditioned physics' index.html
+rg -q '1,700 3D assets' index.html
+rg -q 'eight text-and-property annotations' index.html
+rg -q '15 upper-hemisphere views' index.html
+rg -q 'five segmentation candidates' index.html
+rg -q 'class="section-heading dataset-heading"' index.html
+rg -U -q '\.dataset-layout \{[^}]*display: block;' static/css/site.css
+
+if rg -q 'dataset-copy|dataset-visual' index.html static/css/site.css; then
+  echo "legacy split dataset layout is still present" >&2
+  exit 1
+fi
 rg -q 'From visible surfaces to a complete 3D field' index.html
 rg -q 'static/images/visibility-extraction.webp' index.html
 rg -q 'static/images/interior-filling.webp' index.html
