@@ -4,7 +4,7 @@ set -euo pipefail
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$repo_root"
 
-rg -Fq 'static/images/data-generation.webp?v=20260801-hires' index.html
+rg -Fq 'static/images/data-generation.webp?v=20260801-frame-fix' index.html
 rg -Fq 'static/css/site.css?v=20260801-citation-refine' index.html
 rg -q 'Cite this work\.' index.html
 rg -q 'class="citation-block-header"' index.html
