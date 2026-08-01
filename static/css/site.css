@@ -279,7 +279,6 @@ video {
   margin: 0 auto;
 }
 
-.intro-grid,
 .citation-layout {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -297,14 +296,38 @@ video {
 }
 
 .section-heading > p:not(.section-kicker),
-.abstract-copy,
 .dataset-heading > p:not(.section-kicker) {
   color: var(--muted);
 }
 
-.abstract-copy p {
-  margin: 0 0 20px;
-  font-size: 1.04rem;
+.intro-heading h2 {
+  max-width: 860px;
+  font-size: clamp(2.2rem, 3.8vw, 3.6rem);
+}
+
+.intro-copy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  margin-top: 42px;
+  padding-top: 24px;
+  border-top: 1px solid var(--ink);
+}
+
+.intro-copy-grid p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.intro-copy-grid p:first-child {
+  padding-right: clamp(28px, 4vw, 56px);
+}
+
+.intro-copy-grid p + p {
+  padding-left: clamp(28px, 4vw, 56px);
+  border-left: 1px solid var(--line);
 }
 
 .wide-figure,
@@ -826,10 +849,25 @@ tbody tr:last-child td {
     border-bottom: 1px solid var(--line);
   }
 
-  .intro-grid,
   .citation-layout {
     grid-template-columns: 1fr;
     gap: 42px;
+  }
+
+  .intro-copy-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .intro-copy-grid p:first-child {
+    padding-right: 0;
+  }
+
+  .intro-copy-grid p + p {
+    margin-top: 22px;
+    padding-top: 22px;
+    padding-left: 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
   }
 
   .method-steps {

@@ -5,7 +5,16 @@ repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$repo_root"
 
 rg -q 'static/images/data-generation.webp' index.html
-rg -Fq 'static/css/site.css?v=20260801-hierarchy' index.html
+rg -Fq 'static/css/site.css?v=20260801-overview-align' index.html
+rg -q 'Resolving visual ambiguity with language' index.html
+rg -q 'class="intro-copy-grid"' index.html
+rg -U -q '\.intro-copy-grid \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[^}]*align-items: start;' static/css/site.css
+rg -U -q '(?s)@media \(max-width: 900px\).*?\.intro-copy-grid \{[^}]*grid-template-columns: 1fr;' static/css/site.css
+
+if rg -q 'Appearance alone does not determine physics|class="section-inner intro-grid"' index.html; then
+  echo "legacy oversized overview heading or split layout is still present" >&2
+  exit 1
+fi
 rg -q 'width="700" height="238"' index.html
 rg -U -q '\.dataset-figure img \{[^}]*height: auto;' static/css/site.css
 rg -q 'data-step="segment"' index.html

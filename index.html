@@ -12,7 +12,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>AutoPhyX | Text-Conditioned 3D Physics</title>
   <link rel="icon" href="static/images/hero-poster.jpg">
-  <link rel="stylesheet" href="static/css/site.css?v=20260801-hierarchy">
+  <link rel="stylesheet" href="static/css/site.css?v=20260801-overview-align">
   <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script defer src="static/js/site.js"></script>
 </head>
@@ -64,14 +64,14 @@
     </section>
 
     <section class="section section-intro" id="overview">
-      <div class="section-inner intro-grid">
-        <div>
+      <div class="section-inner">
+        <header class="intro-heading">
           <p class="section-kicker">Why text matters</p>
-          <h2>Appearance alone does not determine physics.</h2>
-        </div>
-        <div class="abstract-copy">
-          <p>A rubber object and a rigid plastic replica can look nearly identical. AutoPhyX resolves this ambiguity by conditioning dense 3D physical property prediction on language, coupling semantic intent with spatial visual features.</p>
-          <p>The resulting voxel field predicts Young's modulus, Poisson's ratio, and density. It transfers across meshes, point clouds, Gaussian Splatting, and NeRF, and can drive both MPM and FEM simulations.</p>
+          <h2>Resolving visual ambiguity with language.</h2>
+        </header>
+        <div class="intro-copy-grid">
+          <p>Objects with nearly identical appearance can have very different physical properties: fresh fruit and a rigid plastic replica may share the same shape and texture while responding differently to force. Methods that rely only on visual cues cannot reliably distinguish these material states.</p>
+          <p>AutoPhyX introduces text as a semantic constraint and fuses it with spatial 3D features. In one forward pass, the model predicts a dense voxel field of Young's modulus, Poisson's ratio, and density that can be transferred to meshes, point clouds, Gaussian Splatting, and NeRF for MPM or FEM simulation.</p>
         </div>
       </div>
       <figure class="wide-figure section-inner">
