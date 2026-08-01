@@ -666,6 +666,14 @@ table {
   border-collapse: collapse;
 }
 
+caption {
+  caption-side: bottom;
+  padding: 13px 20px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: left;
+}
+
 th,
 td {
   padding: 17px 20px;
@@ -700,40 +708,9 @@ tbody tr:last-child td {
   font-weight: 800;
 }
 
-.abo-callout {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
+.benchmark-context {
+  max-width: 920px;
   margin-top: 22px;
-  overflow: hidden;
-  background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-
-.abo-callout > div {
-  padding: 28px;
-  background: #fff;
-}
-
-.abo-callout span {
-  display: block;
-  color: var(--muted);
-  font-size: 0.72rem;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.abo-callout strong {
-  display: block;
-  margin-top: 6px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 2.25rem;
-}
-
-.abo-callout p {
-  max-width: 460px;
-  margin: 8px 0 0;
   color: var(--muted);
   font-size: 0.88rem;
 }
@@ -950,7 +927,7 @@ tbody tr:last-child td {
 
   .method-steps,
   .dataset-process,
-  .abo-callout {
+  .citation-layout {
     grid-template-columns: 1fr;
   }
 

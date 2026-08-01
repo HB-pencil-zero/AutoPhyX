@@ -24,6 +24,13 @@ rg -q 'accumulated transmittance' index.html
 rg -q 'six-direction boundary checks' index.html
 rg -q 'even-odd rule' index.html
 rg -q 'nearest-neighbor' index.html
+rg -q 'On the real-world ABO-500 benchmark' index.html
+rg -q 'Highlighted row marks the best result' index.html
+
+if rg -q 'abo-callout' index.html static/css/site.css; then
+  echo "disconnected benchmark callouts are still present" >&2
+  exit 1
+fi
 
 if rg -q 'Preserve structure, including what the camera cannot see|class="check-list"' index.html; then
   echo "legacy volumetric copy or checklist is still present" >&2

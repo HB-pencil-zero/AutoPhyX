@@ -240,6 +240,7 @@
         </div>
         <div class="table-wrap" tabindex="0" aria-label="Text2Physics benchmark results">
           <table>
+            <caption>Highlighted row marks the best result in every reported metric. Up and down indicate the preferred direction.</caption>
             <thead>
               <tr><th>Method</th><th>PSNR up</th><th>SSIM up</th><th>LPIPS down</th><th>Avg. physics error down</th></tr>
             </thead>
@@ -252,18 +253,7 @@
             </tbody>
           </table>
         </div>
-        <div class="abo-callout">
-          <div>
-            <span>ABO-500</span>
-            <strong>9.433</strong>
-            <p>Average displacement error, down from 11.826 and 12.565 for prior baselines.</p>
-          </div>
-          <div>
-            <span>Runtime</span>
-            <strong>2 seconds</strong>
-            <p>Single-pass inference, compared with minutes to hours for per-scene optimization.</p>
-          </div>
-        </div>
+        <p class="benchmark-context">On the real-world ABO-500 benchmark, AutoPhyX lowers average displacement error to 9.433, compared with 11.826 for NeRF2Physics and 12.565 for Pixie. Feed-forward inference takes 2 seconds; optimization-based baselines require minutes to hours.</p>
       </div>
     </section>
 
