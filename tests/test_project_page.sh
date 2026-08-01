@@ -5,7 +5,18 @@ repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$repo_root"
 
 rg -q 'static/images/data-generation.webp' index.html
-rg -Fq 'static/css/site.css?v=20260801-overview-align' index.html
+rg -Fq 'static/css/site.css?v=20260801-citation-refine' index.html
+rg -q 'Cite this work\.' index.html
+rg -q 'class="citation-block-header"' index.html
+rg -q 'class="site-footer-inner"' index.html
+rg -U -q '\.citation-layout \{[^}]*grid-template-columns: minmax\(0, 0\.68fr\) minmax\(0, 1\.32fr\);[^}]*align-items: start;' static/css/site.css
+rg -U -q '\.site-footer-inner \{[^}]*width: min\(var\(--max-width\), 100%\);' static/css/site.css
+rg -U -q '(?s)@media \(max-width: 640px\).*?\.citation-block pre \{[^}]*white-space: pre-wrap;[^}]*overflow-wrap: anywhere;' static/css/site.css
+
+if rg -U -q '<section class="section citation-section".*?<h2>AutoPhyX</h2>' index.html; then
+  echo "legacy oversized citation heading is still present" >&2
+  exit 1
+fi
 rg -q 'Resolving visual ambiguity with language' index.html
 rg -q 'class="intro-copy-grid"' index.html
 rg -U -q '\.intro-copy-grid \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[^}]*align-items: start;' static/css/site.css
