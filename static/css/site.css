@@ -361,9 +361,20 @@ figcaption {
   margin-inline: auto;
 }
 
+.results-section .centered-heading h2 {
+  font-size: clamp(4.5rem, 8vw, 7rem);
+  font-weight: 700;
+  line-height: 0.95;
+}
+
 .centered-heading > p:last-child {
   max-width: 680px;
   margin: 20px auto 0;
+}
+
+.results-section .demo-subtitle {
+  font-size: 0.9rem;
+  line-height: 1.55;
 }
 
 .segmented-control {
@@ -978,6 +989,14 @@ tbody tr:last-child td {
 
   .section h2 {
     font-size: 2.35rem;
+  }
+
+  .results-section .demo-subtitle {
+    font-size: 0.84rem;
+  }
+
+  .results-section .centered-heading h2 {
+    font-size: 3.8rem;
   }
 
   .citation-heading h2 {
